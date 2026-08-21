@@ -1,4 +1,6 @@
-// Max error's: -13 - 0
+//Copyright (c) 2026 Miraç Salih İşler. This project is licensed under the LGPL-2.1 license.
+
+// Kendime not: Maks. hata: -13 - 0 arası.
 
 #include <string>
 #include <fstream>
