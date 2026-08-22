@@ -1,11 +1,12 @@
 //Copyright (c) 2026 Miraç Salih İşler. This project is licensed under the LGPL-2.1 license.
 
-// Kendime not: Maks. hata: -13 - 0 arası.
+// Kendime not: Maks. hata: -15 - 0 arası.
 
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <map>
 
 static int ret = 0;
 static std::string spesifik_ret = "?";
@@ -27,31 +28,29 @@ typedef struct Token {
 } Token;
 
 static std::vector<Token> tokens;
-static std::vector<std::string> var_name;
+static std::map<std::string, std::string> var;
 
-static void tokenize() {
-    if (tokens.size() == 2) {
+static std::string tokenize() {
+    if (tokens.size() == 1) {
+        if (tokens[0].type == "VARNAME") {
+            return tokens[0].value + " " + var[tokens[0].value];
+        }
+    }
+
+    else if (tokens.size() == 2) {
         if (tokens[0].type == "KEYWORD") {
             if (tokens[0].value == "var") {
-                if (tokens[1].type == "UNKNOW") var_name.push_back(tokens[1].value);
-                else if (tokens[1].type == "VARNAME") return_error("Değişken zaten tanımlanmış!.", -8, "DEĞİŞKEN::ZATEN_TANIMLANMIŞ");
+                if (tokens[1].type == "UNKNOW") var[tokens[1].value] = "";
+                else if (tokens[1].type == "VARNAME") return_error("Değişken zaten tanımlanmış!", -8, "DEĞİŞKEN::ZATEN_TANIMLANMIŞ");
                 else if (tokens[1].type == "HEXNUMBER") return_error("Değişken ismi onaltılık olamaz!", -9, "DEĞİŞKEN::ONALTILIK_OLAMAZ");
                 else if (tokens[1].type == "DECNUMBER") return_error("Değişken ismi onluk olamaz!", -10, "DEĞİŞKEN::ONLUK_OLAMAZ");
                 else if (tokens[1].type == "OCTNUMBER") return_error("Değişken ismi sekizlik olamaz!", -11, "DEĞİŞKEN::SEKİZLİK_OLAMAZ");
                 else if (tokens[1].type == "BINNUMBER") return_error("Değişken ismi ikilik olamaz!", -12, "DEĞİŞKEN::İKİLİK_OLAMAZ");
             }
             
-            else if (tokens[0].value == "delete") {
-                if (tokens[1].type == "VARNAME") {
-                    for (size_t size = 0; size < var_name.size();) {
-                        if (tokens[1].value == var_name[size]) {
-                            var_name.erase(var_name.begin() + size);
-                            break;
-                        }
-                        size++;
-                    }
-                }
-                else if (tokens[1].type == "UNKNOW") return_error("Tanınmayan değişken silinemez!", -14);
+            else if (tokens[0].value == "del") {
+                if (tokens[1].type == "VARNAME") var.erase(tokens[1].value);
+                else if (tokens[1].type == "UNKNOW") return_error("Tanımsız bir değişken silinemez!", -14, "DEĞİŞKEN::TANIMLANMAMIŞ");
                 else if (tokens[1].type == "HEXNUMBER") return_error("Değişken ismi onaltılık olamaz!", -9, "DEĞİŞKEN::ONALTILIK_OLAMAZ");
                 else if (tokens[1].type == "DECNUMBER") return_error("Değişken ismi onluk olamaz!", -10, "DEĞİŞKEN::ONLUK_OLAMAZ");
                 else if (tokens[1].type == "OCTNUMBER") return_error("Değişken ismi sekizlik olamaz!", -11, "DEĞİŞKEN::SEKİZLİK_OLAMAZ");
@@ -61,6 +60,22 @@ static void tokenize() {
             else return_error("Anahtar kullanımı anlaşılamadı.", -13, "ANAHTAR::KULLANIM_ANLAŞILAMADI");
         }
     }
+    
+    else if (tokens.size() == 3) {
+        if (tokens[0].type == "VARNAME") {
+            if (tokens[1].type == "OPERATOR") {
+                if (tokens[1].value == "=") {
+                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -15, "TANIM::TANIMSIZ");
+                    else if (tokens[2].type == "HEXNUMBER") var[tokens[0].value] = tokens[2].value;
+                    else if (tokens[2].type == "DECNUMBER") var[tokens[0].value] = tokens[2].value;
+                    else if (tokens[2].type == "OCTNUMBER") var[tokens[0].value] = tokens[2].value;
+                    else if (tokens[2].type == "BINNUMBER") var[tokens[0].value] = tokens[2].value;
+                }
+            }
+        }
+    }
+
+    return "";
 }
 
 int main(const int argc, const char **argv) {
@@ -94,25 +109,25 @@ int main(const int argc, const char **argv) {
         if (token == ";") {
             ifade_no++;
 
-            tokenize();
+            output << "MQuaLix DBG: " << (tokenize().empty() ? "(dönmedi)" : tokenize()) << std::endl << std::endl;
 
             size = 0;
             tokens.clear();
             continue;
         }
 
-        bool var = false;
-        for (auto & i : var_name) {
-            if (token == i) {
-                var = true;
-                tokens.push_back({.type = "VARNAME", .value = i});
+        bool finded = false;
+        for (const auto& [isim, veri] : var) {
+            if (token == isim) {
+                finded = true;
+                tokens.push_back({.type = "VARNAME", .value = isim});
                 break;
             }
         }
 
-        if (var) {}
-        else if (token == "var") tokens.push_back({.type = "KEYWORD", .value = "var"});
-        else if (token == "delete") tokens.push_back({.type = "KEYWORD", .value = "delete"});
+        if (finded) {}
+        else if (token == "variable" || token == "var") tokens.push_back({.type = "KEYWORD", .value = "var"});
+        else if (token == "delete" || token == "del") tokens.push_back({.type = "KEYWORD", .value = "del"});
 
         else if (token == "=") tokens.push_back({.type = "OPERATOR", .value = "="});
         else if (token == "==") tokens.push_back({.type = "OPERATOR", .value = "=="});
