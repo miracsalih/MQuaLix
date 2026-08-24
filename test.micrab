@@ -1,7 +1,20 @@
-İfade: 1 UNKNOW | !
-İfade: 2 KEYWORD | var
-İfade: 2 UNKNOW | !
-İfade: 3 VARNAME | !
-İfade: 4 KEYWORD | delete
-İfade: 4 VARNAME | !
-İfade: 5 UNKNOW | !
+İfade: 1 KEYWORD | var
+İfade: 1 UNKNOW | test
+MQuaLix DBG: (dönmedi)
+
+İfade: 2 VARNAME | test
+İfade: 2 OPERATOR | =
+İfade: 2 DECNUMBER | 10
+MQuaLix DBG: (dönmedi)
+
+İfade: 3 VARNAME | test
+MQuaLix DBG: test = 10
+
+İfade: 4 VARNAME | test
+İfade: 4 OPERATOR | +
+İfade: 4 DECNUMBER | 15
+MQuaLix DBG: (dönmedi)
+
+İfade: 5 VARNAME | test
+MQuaLix DBG: test = 25
+
