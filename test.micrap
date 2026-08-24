@@ -1,6 +1,6 @@
-! ;
-var ! ;
-! ;
+var test ;
+test = 10 ;
+test ;
 
-delete ! ;
-! ;
+test + 15 ;
+test ;
