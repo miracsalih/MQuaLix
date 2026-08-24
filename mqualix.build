@@ -1,0 +1,7 @@
+mode: normal
+workdir: MQuaLix
+arguments: ~/Masaüstü/Projeler/MQuaLix/test.micrap
+arguments: ~/Masaüstü/Projeler/MQuaLix/test.micrab
+lang: cpp
+compile
+run
