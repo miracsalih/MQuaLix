@@ -1,6 +1,34 @@
 //Copyright (c) 2026 Miraç Salih İşler. This project is licensed under the LGPL-2.1 license.
 
-// Kendime not: Maks. hata: -22 - 0 arası.
+// 1-3: Derleme hataları
+// 4-7: Sayı format hataları
+// 8-15: Değişken işlemleri
+// 16: Sayı dönüştürme
+// 17-22: Koşul işlemleri
+
+/*-1  DERLEME::YETERSİZ_ARGÜMAN
+-2  DERLEME::GİRDİ_DOSYA_AÇILAMADI
+-3  DERLEME::ÇIKTI_DOSYA_AÇILAMADI
+-4  SAYI::ONALTILIK_GEÇERSİZ
+-5  SAYI::ONLUK_GEÇERSİZ
+-6  SAYI::SEKİZLİK_GEÇERSİZ
+-7  SAYI::İKİLİK_GEÇERSİZ
+-8  DEĞİŞKEN::ZATEN_TANIMLANMIŞ
+-9  DEĞİŞKEN::ONALTILIK_OLAMAZ
+-10 DEĞİŞKEN::ONLUK_OLAMAZ
+-11 DEĞİŞKEN::SEKİZLİK_OLAMAZ
+-12 DEĞİŞKEN::İKİLİK_OLAMAZ
+-13 ANAHTAR::KULLANIM_ANLAŞILAMADI
+-14 DEĞİŞKEN::TANIMLANMAMIŞ
+-15 TANIM::TANIMSIZ
+-16 SAYI::DÖNÜŞTÜRME_HATASI
+-17 KOŞUL::ATAMA_YAPILAMAZ
+-18 KOŞUL::TOPLAMA_YAPILAMAZ
+-19 KOŞUL::ÇIKARMA_YAPILAMAZ
+-20 KOŞUL::BÖLME_YAPILAMAZ
+-21 KOŞUL::ÇARPMA_YAPILAMAZ
+-22 KOŞUL::KOŞUL_SAĞLANMAMIŞ
+-23 KOŞUL::ELSE_HATASI*/
 
 #include <string>
 #include <fstream>
@@ -36,28 +64,27 @@ static int get_number(Token token) {
     else if (token.type == "DECNUMBER") return stoi(token.value, 0, 10);
     else if (token.type == "OCTNUMBER") return stoi(token.value, 0, 8);
     else if (token.type == "BINNUMBER") return stoi(token.value, 0, 2);
-    else return_error("Sayı dönüştürme hatası.", -16, "SAYI::DÖNÜŞTÜRME_HATASI");
-    return 0;
+    else {
+        return_error("Sayı dönüştürme hatası.", -16, "SAYI::DÖNÜŞTÜRME_HATASI");
+        return 0;
+    }
 }
 
 static std::string tokenize() {
     if (tokens.empty()) return "";
     
-    // endif işleme
     if (tokens.size() == 1 && tokens[0].type == "KEYWORD" && tokens[0].value == "endif") {
-        if (equal.empty()) return_error("Koşul sağlanmamış!", -19, "KOŞUL::KOŞUL_SAĞLANMAMIŞ");
+        if (equal.empty()) return_error("Koşul sağlanmamış!", -22, "KOŞUL::KOŞUL_SAĞLANMAMIŞ");
         else equal.pop_back();
         return "";
     }
-    
-    // else işleme
+
     if (tokens.size() == 1 && tokens[0].type == "KEYWORD" && tokens[0].value == "else") {
-        if (equal.empty()) return_error("Else eşleşmiyor!", -20, "KOŞUL::ELSE_HATASI");
+        if (equal.empty()) return_error("Else eşleşmiyor!", -23, "KOŞUL::ELSE_HATASI");
         else equal.back() = !equal.back();
         return "";
     }
     
-    // Koşul kontrolü: Eğer koşul false ise bu ifadeyi atla
     if (!equal.empty() && !equal.back()) return "";
 
     if (tokens[0].type == "VARNAME" && tokens.size() == 1) {
@@ -148,7 +175,7 @@ static std::string tokenize() {
             }
         }
     }
-    
+
     else if (tokens.size() == 4) {
         if (tokens[0].type == "KEYWORD") {
             if (tokens[0].value == "if") {
@@ -161,11 +188,11 @@ static std::string tokenize() {
                     }
                 }
 
-                if (tokens[1].value == "=") return_error("Atama koşul karşılaştırmasında yapılamaz!", -18, "KOŞUL::ATAMA_YAPILAMAZ");
-                else if (tokens[1].value == "+") return_error("Toplama koşul karşılaştırmasında yapılamaz!", -19, "KOŞUL::TOPLAMA_YAPILAMAZ");
-                else if (tokens[1].value == "-") return_error("Çıkarma koşul karşılaştırmasında yapılamaz!", -20, "KOŞUL::ÇIKARMA_YAPILAMAZ");
-                else if (tokens[1].value == "/") return_error("Bölme koşul karşılaştırmasında yapılamaz!", -21, "KOŞUL::BÖLME_YAPILAMAZ");
-                else if (tokens[1].value == "*") return_error("Çarpma koşul karşılaştırmasında yapılamaz!", -22, "KOŞUL::ÇARPMA_YAPILAMAZ");
+                if (tokens[1].value == "=") return_error("Atama koşul karşılaştırmasında yapılamaz!", -17, "KOŞUL::ATAMA_YAPILAMAZ");
+                else if (tokens[1].value == "+") return_error("Toplama koşul karşılaştırmasında yapılamaz!", -18, "KOŞUL::TOPLAMA_YAPILAMAZ");
+                else if (tokens[1].value == "-") return_error("Çıkarma koşul karşılaştırmasında yapılamaz!", -19, "KOŞUL::ÇIKARMA_YAPILAMAZ");
+                else if (tokens[1].value == "/") return_error("Bölme koşul karşılaştırmasında yapılamaz!", -20, "KOŞUL::BÖLME_YAPILAMAZ");
+                else if (tokens[1].value == "*") return_error("Çarpma koşul karşılaştırmasında yapılamaz!", -21, "KOŞUL::ÇARPMA_YAPILAMAZ");
                 else if (tokens[1].value == "==") {
                     int sol = get_number(tokens[0]);
                     int sag = get_number(tokens[2]);
