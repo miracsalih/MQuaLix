@@ -10,11 +10,32 @@ MQuaLix DBG: (dönmedi)
 İfade: 3 VARNAME | test
 MQuaLix DBG: test = 10
 
+İfade: 4 KEYWORD | if
 İfade: 4 VARNAME | test
-İfade: 4 OPERATOR | +
-İfade: 4 DECNUMBER | 15
-MQuaLix DBG: (dönmedi)
+İfade: 4 OPERATOR | ==
+İfade: 4 DECNUMBER | 10
+MQuaLix DBG: True!
 
 İfade: 5 VARNAME | test
-MQuaLix DBG: test = 25
+İfade: 5 OPERATOR | +
+İfade: 5 DECNUMBER | 10
+MQuaLix DBG: (dönmedi)
+
+İfade: 6 KEYWORD | else
+MQuaLix DBG: (dönmedi)
+
+İfade: 7 VARNAME | test
+İfade: 7 OPERATOR | +
+İfade: 7 DECNUMBER | 5
+MQuaLix DBG: (dönmedi)
+
+İfade: 8 KEYWORD | endif
+MQuaLix DBG: (dönmedi)
+
+İfade: 9 KEYWORD | print
+İfade: 9 VARNAME | test
+MQuaLix DBG: (dönmedi)
+
+İfade: 10 VARNAME | test
+MQuaLix DBG: test = 20
 
