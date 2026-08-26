@@ -1,6 +1,6 @@
 //Copyright (c) 2026 Miraç Salih İşler. This project is licensed under the LGPL-2.1 license.
 
-// Kendime not: Maks. hata: -16 - 0 arası.
+// Kendime not: Maks. hata: -22 - 0 arası.
 
 #include <string>
 #include <fstream>
@@ -28,6 +28,7 @@ typedef struct Token {
 } Token;
 
 static std::vector<Token> tokens;
+static std::vector<bool> equal;
 static std::map<std::string, Token> var;
 
 static int get_number(Token token) {
@@ -40,10 +41,37 @@ static int get_number(Token token) {
 }
 
 static std::string tokenize() {
-    if (tokens.size() == 1) {
-        if (tokens[0].type == "VARNAME") {
-            return tokens[0].value + " = " + var[tokens[0].value].value;
+    if (tokens.empty()) return "";
+    
+    // endif işleme
+    if (tokens.size() == 1 && tokens[0].type == "KEYWORD" && tokens[0].value == "endif") {
+        if (equal.empty()) return_error("Koşul sağlanmamış!", -19, "KOŞUL::KOŞUL_SAĞLANMAMIŞ");
+        else equal.pop_back();
+        return "";
+    }
+    
+    // else işleme
+    if (tokens.size() == 1 && tokens[0].type == "KEYWORD" && tokens[0].value == "else") {
+        if (equal.empty()) return_error("Else eşleşmiyor!", -20, "KOŞUL::ELSE_HATASI");
+        else equal.back() = !equal.back();
+        return "";
+    }
+    
+    // Koşul kontrolü: Eğer koşul false ise bu ifadeyi atla
+    if (!equal.empty() && !equal.back()) return "";
+
+    if (tokens[0].type == "VARNAME" && tokens.size() == 1) {
+        return tokens[0].value + " = " + var[tokens[0].value].value;
+    }
+
+    else if (tokens[0].type == "KEYWORD" && tokens[0].value == "print") {
+        tokens.erase(tokens.begin());
+        for (const auto& i : tokens) {
+            if (i.type == "VARNAME") std::cout << var[i.value].value << " ";
+            else std::cout << i.value << " ";
         }
+        std::cout << std::endl;
+        return "";
     }
 
     else if (tokens.size() == 2) {
@@ -120,6 +148,33 @@ static std::string tokenize() {
             }
         }
     }
+    
+    else if (tokens.size() == 4) {
+        if (tokens[0].type == "KEYWORD") {
+            if (tokens[0].value == "if") {
+                tokens.erase(tokens.begin());
+                for (size_t size = 0; size < tokens.size(); size++) {
+                    if (tokens[size].type == "VARNAME") {
+                        int deger = get_number(var[tokens[size].value]);
+                        tokens[size].value = std::to_string(deger);
+                        tokens[size].type = "DECNUMBER";
+                    }
+                }
+
+                if (tokens[1].value == "=") return_error("Atama koşul karşılaştırmasında yapılamaz!", -18, "KOŞUL::ATAMA_YAPILAMAZ");
+                else if (tokens[1].value == "+") return_error("Toplama koşul karşılaştırmasında yapılamaz!", -19, "KOŞUL::TOPLAMA_YAPILAMAZ");
+                else if (tokens[1].value == "-") return_error("Çıkarma koşul karşılaştırmasında yapılamaz!", -20, "KOŞUL::ÇIKARMA_YAPILAMAZ");
+                else if (tokens[1].value == "/") return_error("Bölme koşul karşılaştırmasında yapılamaz!", -21, "KOŞUL::BÖLME_YAPILAMAZ");
+                else if (tokens[1].value == "*") return_error("Çarpma koşul karşılaştırmasında yapılamaz!", -22, "KOŞUL::ÇARPMA_YAPILAMAZ");
+                else if (tokens[1].value == "==") {
+                    int sol = get_number(tokens[0]);
+                    int sag = get_number(tokens[2]);
+                    equal.push_back(sol == sag);
+                    return (sol == sag ? "True!" : "False!");
+                }
+            }
+        }
+    }
 
     return "";
 }
@@ -155,7 +210,8 @@ int main(const int argc, const char **argv) {
         if (token == ";") {
             ifade_no++;
 
-            output << "MQuaLix DBG: " << (tokenize().empty() ? "(dönmedi)" : tokenize()) << std::endl << std::endl;
+            std::string out = tokenize();
+            output << "MQuaLix DBG: " << (out.empty() ? "(dönmedi)" : out) << std::endl << std::endl;
 
             size = 0;
             tokens.clear();
@@ -174,6 +230,11 @@ int main(const int argc, const char **argv) {
         if (finded) {}
         else if (token == "variable" || token == "var") tokens.push_back({.type = "KEYWORD", .value = "var"});
         else if (token == "delete" || token == "del") tokens.push_back({.type = "KEYWORD", .value = "del"});
+        else if (token == "print") tokens.push_back({.type = "KEYWORD", .value = "print"});
+
+        else if (token == "if") tokens.push_back({.type = "KEYWORD", .value = "if"});
+        else if (token == "else") tokens.push_back({.type = "KEYWORD", .value = "else"});
+        else if (token == "endif") tokens.push_back({.type = "KEYWORD", .value = "endif"});
 
         else if (token == "=") tokens.push_back({.type = "OPERATOR", .value = "="});
         else if (token == "==") tokens.push_back({.type = "OPERATOR", .value = "=="});
@@ -181,6 +242,7 @@ int main(const int argc, const char **argv) {
         else if (token == "-") tokens.push_back({.type = "OPERATOR", .value = "-"});
         else if (token == "/") tokens.push_back({.type = "OPERATOR", .value = "/"});
         else if (token == "*") tokens.push_back({.type = "OPERATOR", .value = "*"});
+
         else if (token.front() == '#') tokens.push_back({.type = "DEFINITE", .value = token.substr(1)});
 
         else if (token.substr(0, 2) == "0x") {
