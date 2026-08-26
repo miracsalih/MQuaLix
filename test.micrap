@@ -2,5 +2,11 @@ var test ;
 test = 10 ;
 test ;
 
-test + 15 ;
+if test == 10 ;
+test + 10 ;
+else ;
+test + 5 ;
+endif ;
+
+print test ;
 test ;
