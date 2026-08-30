@@ -2,34 +2,37 @@
 
 // 1-3: Derleme hataları
 // 4-7: Sayı format hataları
-// 8-15: Değişken işlemleri
-// 16: Sayı dönüştürme
-// 17-22: Koşul işlemleri
+// 8-10: Değişken hataları
+// 11: Tanımlanma hataları
+// 12-19: Koşul hataları
 
-/*-1  DERLEME::YETERSİZ_ARGÜMAN
+/*
+-1  DERLEME::YETERSİZ_ARGÜMAN
 -2  DERLEME::GİRDİ_DOSYA_AÇILAMADI
 -3  DERLEME::ÇIKTI_DOSYA_AÇILAMADI
+
 -4  SAYI::ONALTILIK_GEÇERSİZ
 -5  SAYI::ONLUK_GEÇERSİZ
 -6  SAYI::SEKİZLİK_GEÇERSİZ
 -7  SAYI::İKİLİK_GEÇERSİZ
--8  DEĞİŞKEN::ZATEN_TANIMLANMIŞ
--9  DEĞİŞKEN::ONALTILIK_OLAMAZ
--10 DEĞİŞKEN::ONLUK_OLAMAZ
--11 DEĞİŞKEN::SEKİZLİK_OLAMAZ
--12 DEĞİŞKEN::İKİLİK_OLAMAZ
--13 ANAHTAR::KULLANIM_ANLAŞILAMADI
--14 DEĞİŞKEN::TANIMLANMAMIŞ
--15 TANIM::TANIMSIZ
--16 SAYI::DÖNÜŞTÜRME_HATASI
--17 KOŞUL::ATAMA_YAPILAMAZ
--18 KOŞUL::TOPLAMA_YAPILAMAZ
--19 KOŞUL::ÇIKARMA_YAPILAMAZ
--20 KOŞUL::BÖLME_YAPILAMAZ
--21 KOŞUL::ÇARPMA_YAPILAMAZ
--22 KOŞUL::KOŞUL_SAĞLANMAMIŞ
--23 KOŞUL::ELSE_HATASI*/
 
+-8  DEĞİŞKEN::ZATEN_TANIMLANMIŞ
+-9 DEĞİŞKEN::TANIMLANMAMIŞ
+-10  DEĞİŞKEN::SAYISAL_OLAMAZ
+
+-11 TANIM::TANIMSIZ
+
+-12 SAYI::DÖNÜŞTÜRME_HATASI
+-13 KOŞUL::ATAMA_YAPILAMAZ
+-14 KOŞUL::TOPLAMA_YAPILAMAZ
+-15 KOŞUL::ÇIKARMA_YAPILAMAZ
+-16 KOŞUL::BÖLME_YAPILAMAZ
+-17 KOŞUL::ÇARPMA_YAPILAMAZ
+-18 KOŞUL::KOŞUL_SAĞLANMAMIŞ
+-19 KOŞUL::ELSE_HATASI
+*/
+
+#include <stdexcept>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -60,12 +63,9 @@ static std::vector<bool> equal;
 static std::map<std::string, Token> var;
 
 static int get_number(Token token) {
-    if (token.type == "HEXNUMBER") return stoi(token.value, 0, 16);
-    else if (token.type == "DECNUMBER") return stoi(token.value, 0, 10);
-    else if (token.type == "OCTNUMBER") return stoi(token.value, 0, 8);
-    else if (token.type == "BINNUMBER") return stoi(token.value, 0, 2);
-    else {
-        return_error("Sayı dönüştürme hatası.", -16, "SAYI::DÖNÜŞTÜRME_HATASI");
+    try {
+        return stoi(token.value, 0, 10);
+    } catch (std::invalid_argument) {
         return 0;
     }
 }
@@ -74,13 +74,13 @@ static std::string tokenize() {
     if (tokens.empty()) return "";
     
     if (tokens.size() == 1 && tokens[0].type == "KEYWORD" && tokens[0].value == "endif") {
-        if (equal.empty()) return_error("Koşul sağlanmamış!", -22, "KOŞUL::KOŞUL_SAĞLANMAMIŞ");
+        if (equal.empty()) return_error("Koşul sağlanmamış!", -18, "KOŞUL::KOŞUL_SAĞLANMAMIŞ");
         else equal.pop_back();
         return "";
     }
 
     if (tokens.size() == 1 && tokens[0].type == "KEYWORD" && tokens[0].value == "else") {
-        if (equal.empty()) return_error("Else eşleşmiyor!", -23, "KOŞUL::ELSE_HATASI");
+        if (equal.empty()) return_error("Else eşleşmiyor!", -19, "KOŞUL::ELSE_HATASI");
         else equal.back() = !equal.back();
         return "";
     }
@@ -106,22 +106,14 @@ static std::string tokenize() {
             if (tokens[0].value == "var") {
                 if (tokens[1].type == "UNKNOW") var[tokens[1].value] = {.type = "VARNAME", .value = "n"};
                 else if (tokens[1].type == "VARNAME") return_error("Değişken zaten tanımlanmış!", -8, "DEĞİŞKEN::ZATEN_TANIMLANMIŞ");
-                else if (tokens[1].type == "HEXNUMBER") return_error("Değişken ismi onaltılık olamaz!", -9, "DEĞİŞKEN::ONALTILIK_OLAMAZ");
-                else if (tokens[1].type == "DECNUMBER") return_error("Değişken ismi onluk olamaz!", -10, "DEĞİŞKEN::ONLUK_OLAMAZ");
-                else if (tokens[1].type == "OCTNUMBER") return_error("Değişken ismi sekizlik olamaz!", -11, "DEĞİŞKEN::SEKİZLİK_OLAMAZ");
-                else if (tokens[1].type == "BINNUMBER") return_error("Değişken ismi ikilik olamaz!", -12, "DEĞİŞKEN::İKİLİK_OLAMAZ");
+                else if (tokens[1].type == "NUMBER") return_error("Değişken ismi sayısal olamaz!", -10, "DEĞİŞKEN::SAYISAL_OLAMAZ");
             }
             
             else if (tokens[0].value == "del") {
                 if (tokens[1].type == "VARNAME") var.erase(tokens[1].value);
-                else if (tokens[1].type == "UNKNOW") return_error("Tanımsız bir değişken silinemez!", -14, "DEĞİŞKEN::TANIMLANMAMIŞ");
-                else if (tokens[1].type == "HEXNUMBER") return_error("Değişken ismi onaltılık olamaz!", -9, "DEĞİŞKEN::ONALTILIK_OLAMAZ");
-                else if (tokens[1].type == "DECNUMBER") return_error("Değişken ismi onluk olamaz!", -10, "DEĞİŞKEN::ONLUK_OLAMAZ");
-                else if (tokens[1].type == "OCTNUMBER") return_error("Değişken ismi sekizlik olamaz!", -11, "DEĞİŞKEN::SEKİZLİK_OLAMAZ");
-                else if (tokens[1].type == "BINNUMBER") return_error("Değişken ismi ikilik olamaz!", -12, "DEĞİŞKEN::İKİLİK_OLAMAZ");
+                else if (tokens[1].type == "UNKNOW") return_error("Tanımsız bir değişken silinemez!", -9, "DEĞİŞKEN::TANIMLANMAMIŞ");
+                else if (tokens[1].type == "NUMBER") return_error("Değişken ismi sayısal olamaz!", -10, "DEĞİŞKEN::SAYISAL_OLAMAZ");
             }
-            
-            else return_error("Anahtar kullanımı anlaşılamadı.", -13, "ANAHTAR::KULLANIM_ANLAŞILAMADI");
         }
     }
     
@@ -129,48 +121,33 @@ static std::string tokenize() {
         if (tokens[0].type == "VARNAME") {
             if (tokens[1].type == "OPERATOR") {
                 if (tokens[1].value == "=") {
-                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -15, "TANIM::TANIMSIZ");
-                    else if (tokens[2].type == "HEXNUMBER") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(tokens[2]))};
-                    else if (tokens[2].type == "DECNUMBER") var[tokens[0].value] = {.type = "DECNUMBER", .value = std::to_string(get_number(tokens[2]))};
-                    else if (tokens[2].type == "OCTNUMBER") var[tokens[0].value] = {.type = "OCTNUMBER", .value = std::to_string(get_number(tokens[2]))};
-                    else if (tokens[2].type == "BINNUMBER") var[tokens[0].value] = {.type = "BINNUMBER", .value = std::to_string(get_number(tokens[2]))};
-                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(var[tokens[2].value]))};
+                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -11, "TANIM::TANIMSIZ");
+                    else if (tokens[2].type == "NUMBER") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(tokens[2]))};
+                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(var[tokens[2].value]))};
                 }
 
                 else if (tokens[1].value == "+") {
-                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -15, "TANIM::TANIMSIZ");
-                    else if (tokens[2].type == "HEXNUMBER") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) + get_number(tokens[2]))};
-                    else if (tokens[2].type == "DECNUMBER") var[tokens[0].value] = {.type = "DECNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) + get_number(tokens[2]))};
-                    else if (tokens[2].type == "OCTNUMBER") var[tokens[0].value] = {.type = "OCTNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) + get_number(tokens[2]))};
-                    else if (tokens[2].type == "BINNUMBER") var[tokens[0].value] = {.type = "BINNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) + get_number(tokens[2]))};
-                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) + get_number(var[tokens[2].value]))};
+                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -11, "TANIM::TANIMSIZ");
+                    else if (tokens[2].type == "NUMBER") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(var[tokens[0].value]) + get_number(tokens[2]))};
+                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(var[tokens[0].value]) + get_number(var[tokens[2].value]))};
                 }
 
                 else if (tokens[1].value == "-") {
-                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -15, "TANIM::TANIMSIZ");
-                    else if (tokens[2].type == "HEXNUMBER") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) - get_number(tokens[2]))};
-                    else if (tokens[2].type == "DECNUMBER") var[tokens[0].value] = {.type = "DECNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) - get_number(tokens[2]))};
-                    else if (tokens[2].type == "OCTNUMBER") var[tokens[0].value] = {.type = "OCTNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) - get_number(tokens[2]))};
-                    else if (tokens[2].type == "BINNUMBER") var[tokens[0].value] = {.type = "BINNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) - get_number(tokens[2]))};
-                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) - get_number(var[tokens[2].value]))};
+                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -11, "TANIM::TANIMSIZ");
+                    else if (tokens[2].type == "NUMBER") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(var[tokens[0].value]) - get_number(tokens[2]))};
+                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(var[tokens[0].value]) - get_number(var[tokens[2].value]))};
                 }
 
                 else if (tokens[1].value == "/") {
-                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -15, "TANIM::TANIMSIZ");
-                    else if (tokens[2].type == "HEXNUMBER") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) / get_number(tokens[2]))};
-                    else if (tokens[2].type == "DECNUMBER") var[tokens[0].value] = {.type = "DECNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) / get_number(tokens[2]))};
-                    else if (tokens[2].type == "OCTNUMBER") var[tokens[0].value] = {.type = "OCTNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) / get_number(tokens[2]))};
-                    else if (tokens[2].type == "BINNUMBER") var[tokens[0].value] = {.type = "BINNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) / get_number(tokens[2]))};
-                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) / get_number(var[tokens[2].value]))};
+                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -11, "TANIM::TANIMSIZ");
+                    else if (tokens[2].type == "NUMBER") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(var[tokens[0].value]) / get_number(tokens[2]))};
+                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(var[tokens[0].value]) / get_number(var[tokens[2].value]))};
                 }
 
                 else if (tokens[1].value == "*") {
-                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -15, "TANIM::TANIMSIZ");
-                    else if (tokens[2].type == "HEXNUMBER") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) * get_number(tokens[2]))};
-                    else if (tokens[2].type == "DECNUMBER") var[tokens[0].value] = {.type = "DECNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) * get_number(tokens[2]))};
-                    else if (tokens[2].type == "OCTNUMBER") var[tokens[0].value] = {.type = "OCTNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) * get_number(tokens[2]))};
-                    else if (tokens[2].type == "BINNUMBER") var[tokens[0].value] = {.type = "BINNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) * get_number(tokens[2]))};
-                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "HEXNUMBER", .value = std::to_string(get_number(var[tokens[0].value]) * get_number(var[tokens[2].value]))};
+                    if (tokens[2].type == "UNKNOW") return_error("Tanımsız bir şey...", -11, "TANIM::TANIMSIZ");
+                    else if (tokens[2].type == "NUMBER") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(var[tokens[0].value]) * get_number(tokens[2]))};
+                    else if (tokens[2].type == "VARNAME") var[tokens[0].value] = {.type = "NUMBER", .value = std::to_string(get_number(var[tokens[0].value]) * get_number(var[tokens[2].value]))};
                 }
             }
         }
@@ -184,15 +161,15 @@ static std::string tokenize() {
                     if (tokens[size].type == "VARNAME") {
                         int deger = get_number(var[tokens[size].value]);
                         tokens[size].value = std::to_string(deger);
-                        tokens[size].type = "DECNUMBER";
+                        tokens[size].type = "NUMBER";
                     }
                 }
 
-                if (tokens[1].value == "=") return_error("Atama koşul karşılaştırmasında yapılamaz!", -17, "KOŞUL::ATAMA_YAPILAMAZ");
-                else if (tokens[1].value == "+") return_error("Toplama koşul karşılaştırmasında yapılamaz!", -18, "KOŞUL::TOPLAMA_YAPILAMAZ");
-                else if (tokens[1].value == "-") return_error("Çıkarma koşul karşılaştırmasında yapılamaz!", -19, "KOŞUL::ÇIKARMA_YAPILAMAZ");
-                else if (tokens[1].value == "/") return_error("Bölme koşul karşılaştırmasında yapılamaz!", -20, "KOŞUL::BÖLME_YAPILAMAZ");
-                else if (tokens[1].value == "*") return_error("Çarpma koşul karşılaştırmasında yapılamaz!", -21, "KOŞUL::ÇARPMA_YAPILAMAZ");
+                if (tokens[1].value == "=") return_error("Atama koşul karşılaştırmasında yapılamaz!", -13, "KOŞUL::ATAMA_YAPILAMAZ");
+                else if (tokens[1].value == "+") return_error("Toplama koşul karşılaştırmasında yapılamaz!", -14, "KOŞUL::TOPLAMA_YAPILAMAZ");
+                else if (tokens[1].value == "-") return_error("Çıkarma koşul karşılaştırmasında yapılamaz!", -15, "KOŞUL::ÇIKARMA_YAPILAMAZ");
+                else if (tokens[1].value == "/") return_error("Bölme koşul karşılaştırmasında yapılamaz!", -16, "KOŞUL::BÖLME_YAPILAMAZ");
+                else if (tokens[1].value == "*") return_error("Çarpma koşul karşılaştırmasında yapılamaz!", -17, "KOŞUL::ÇARPMA_YAPILAMAZ");
                 else if (tokens[1].value == "==") {
                     int sol = get_number(tokens[0]);
                     int sag = get_number(tokens[2]);
@@ -307,7 +284,7 @@ int main(const int argc, const char **argv) {
                 continue;
             }
 
-            tokens.push_back({.type = "HEXNUMBER", .value = token});
+            tokens.push_back({.type = "NUMBER", .value = std::to_string(stoi(token, 0, 16))});
         }
 
         else if (token.front() == '1' ||
@@ -340,7 +317,7 @@ int main(const int argc, const char **argv) {
                 continue;
             }
             
-            tokens.push_back({.type = "DECNUMBER", .value = token});
+            tokens.push_back({.type = "NUMBER", .value = std::to_string(stoi(token, 0, 10))});
         }
 
         else if (token.front() == '0') {
@@ -364,7 +341,7 @@ int main(const int argc, const char **argv) {
                 continue;
             }
 
-            tokens.push_back({.type = "OCTNUMBER", .value = token});
+            tokens.push_back({.type = "NUMBER", .value = std::to_string(stoi(token, 0, 8))});
         }
 
         else if (token.substr(0, 2) == "0b") {
@@ -382,7 +359,7 @@ int main(const int argc, const char **argv) {
                 continue;
             }
 
-            tokens.push_back({.type = "BINNUMBER", .value = token});
+            tokens.push_back({.type = "NUMBER", .value = std::to_string(stoi(token, 0, 2))});
         }
 
         else tokens.push_back({.type = "UNKNOW", .value = token});
