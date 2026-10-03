@@ -3,7 +3,49 @@ LEXER:
 Line: 1
 
 Type: OPERATÖR DEĞİL
-Data: var
+Data: int
+
+Type: OPERATÖR DEĞİL
+Data: test
+
+Type: OPERATÖR
+Data: =
+
+Type: OPERATÖR DEĞİL
+Data: 0x12
+
+Line: 2
+
+Type: OPERATÖR DEĞİL
+Data: int
+
+Type: OPERATÖR DEĞİL
+Data: test
+
+Type: OPERATÖR
+Data: =
+
+Type: OPERATÖR DEĞİL
+Data: 0b10
+
+Line: 3
+
+Type: OPERATÖR DEĞİL
+Data: int
+
+Type: OPERATÖR DEĞİL
+Data: test
+
+Type: OPERATÖR
+Data: =
+
+Type: OPERATÖR DEĞİL
+Data: 012
+
+Line: 4
+
+Type: OPERATÖR DEĞİL
+Data: int
 
 Type: OPERATÖR DEĞİL
 Data: test
@@ -14,21 +56,32 @@ Data: =
 Type: OPERATÖR DEĞİL
 Data: 12
 
-Line: 2
+---
 
-Type: OPERATÖR DEĞİL
-Data: Lexer
+PARSER: 
 
-Type: OPERATÖR
-Data: ::
+Expression Type: Test
+Argument[1]: int
+Argument[2]: test
+Argument[3]: =
+Argument[4]: 18
 
-Type: OPERATÖR DEĞİL
-Data: Type
+Expression Type: Test
+Argument[1]: int
+Argument[2]: test
+Argument[3]: =
+Argument[4]: 2
 
-Type: OPERATÖR
-Data: ::
+Expression Type: Test
+Argument[1]: int
+Argument[2]: test
+Argument[3]: =
+Argument[4]: 10
 
-Type: OPERATÖR DEĞİL
-Data: noop
+Expression Type: Test
+Argument[1]: int
+Argument[2]: test
+Argument[3]: =
+Argument[4]: 12
 
 ---
