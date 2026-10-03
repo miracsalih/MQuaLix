@@ -4,8 +4,10 @@
 
 struct Parser {
     enum Type {
-        If,
-        Var
+        /*VarAdd,
+        If*/
+        Error,
+        Test
     };
 
     Parser::Type what_is;
