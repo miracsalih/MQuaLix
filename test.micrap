@@ -1,6 +1,4 @@
-// Hey, derleyici bunu okuyorsa hatalı!
-var test /*Bunu da okuyorsa hatalı!*/=12;
-
-// Şimdi karmaşık sözdizimini deneyelim:
-Lexer:/*Bunu da okuyorsa hatalı!*/:Type:://Burayı okumamalı!
-noop;
+int test=0x12;
+int test=0b10;
+int test=012;
+int test=12;
