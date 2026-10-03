@@ -21,4 +21,4 @@ Derleyici, komut satırından aşağıdaki formatta çağrılır:
 
 ## 2. UYARI:
 
-Bu derleyici, 2.0.0-alpha2 sürümündedir. O yüzden bu dallanma (branch) içinde hata olabilir. Ama olabildiğince kısa sürede hataları düzeltip 2.0.0 sürümünü yayınlayacağız!
+Bu derleyici, 1.0.0-alpha2 sürümündedir. O yüzden bu dallanma (branch) içinde hata olabilir. Ama olabildiğince kısa sürede hataları düzeltip 1.0.0 sürümünü yayınlayacağız!
