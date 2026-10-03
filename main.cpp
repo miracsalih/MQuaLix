@@ -26,8 +26,8 @@ static std::string lexertypeto(Lexer::Type lexertype) {
 }
 
 static std::string parsertypeto(Parser::Type lexertype) {
-    if (lexertype == Parser::Type::If) return "IF";
-    else return "VAR";
+    if (lexertype == Parser::Type::Error) return "Error";
+    else return "Test";
 }
 
 int main(int argc, char* argv[]) {
@@ -54,9 +54,8 @@ int main(int argc, char* argv[]) {
     std::map<int, std::vector<Lexer::Out>> code1 = lexerfunc(ss);
 
     output << "LEXER: " << "\n\n";
-    for (int line = 0; line < code1.size(); line++) {
+    for (const auto& [line, out] : code1) {
         output << "Line: " << line+1 << "\n\n";
-        std::vector<Lexer::Out> out = code1[line];
         for (const auto& [type, data] : out) {
             output << "Type: " << lexertypeto(type) << "\n"
                    << "Data: " << data << "\n\n";
@@ -67,10 +66,10 @@ int main(int argc, char* argv[]) {
     std::vector<Parser> code2 = parserfunc(code1);
 
     output << "PARSER: " << "\n\n";
-    for (const auto& [type, data] : code2) {
-        output << "Expression Type: " << parsertypeto(type) << "\n";
-        for (size_t size = 0; size < data.size(); size++) {
-            output << "Argument[" << size+1 << "]: " << data[size] << "\n";
+    for (const Parser& data : code2) {
+        output << "Expression Type: " << parsertypeto(data.what_is) << "\n";
+        for (size_t size = 0; size < data.args.size(); size++) {
+            output << "Argument[" << size+1 << "]: " << data.args[size] << "\n";
         }
         output << "\n";
     }
