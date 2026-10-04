@@ -6,13 +6,13 @@ Type: OPERATÖR DEĞİL
 Data: int
 
 Type: OPERATÖR DEĞİL
-Data: test
+Data: x
 
 Type: OPERATÖR
 Data: =
 
 Type: OPERATÖR DEĞİL
-Data: 0x12
+Data: 5
 
 Line: 2
 
@@ -20,68 +20,42 @@ Type: OPERATÖR DEĞİL
 Data: int
 
 Type: OPERATÖR DEĞİL
-Data: test
-
-Type: OPERATÖR
-Data: =
-
-Type: OPERATÖR DEĞİL
-Data: 0b10
+Data: x
 
 Line: 3
 
 Type: OPERATÖR DEĞİL
-Data: int
+Data: string
 
 Type: OPERATÖR DEĞİL
-Data: test
+Data: y
 
 Type: OPERATÖR
 Data: =
 
 Type: OPERATÖR DEĞİL
-Data: 012
-
-Line: 4
-
-Type: OPERATÖR DEĞİL
-Data: int
-
-Type: OPERATÖR DEĞİL
-Data: test
-
-Type: OPERATÖR
-Data: =
-
-Type: OPERATÖR DEĞİL
-Data: 12
+Data: "hello world!"
 
 ---
 
 PARSER: 
 
-Expression Type: Test
-Argument[1]: int
-Argument[2]: test
-Argument[3]: =
-Argument[4]: 18
+Line: 1
+new int;
+name x=;
+data{;
+	mov %0 5;
+};
 
-Expression Type: Test
-Argument[1]: int
-Argument[2]: test
-Argument[3]: =
-Argument[4]: 2
+Line: 2
+new int;
+name x};
 
-Expression Type: Test
-Argument[1]: int
-Argument[2]: test
-Argument[3]: =
-Argument[4]: 10
-
-Expression Type: Test
-Argument[1]: int
-Argument[2]: test
-Argument[3]: =
-Argument[4]: 12
+Line: 3
+new string;
+name y=;
+data{;
+	mov %0 "hello world!";
+};
 
 ---
