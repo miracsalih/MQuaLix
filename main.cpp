@@ -25,11 +25,6 @@ static std::string lexertypeto(Lexer::Type lexertype) {
     else return "OPERATÖR";
 }
 
-static std::string parsertypeto(Parser::Type lexertype) {
-    if (lexertype == Parser::Type::Error) return "Error";
-    else return "Test";
-}
-
 int main(int argc, char* argv[]) {
     if (argc < 3) {
         std::cerr << "Kullanım: " << argv[0] << " <girdi_dosyası> <çıktı_dosyası>" << std::endl;
@@ -63,14 +58,12 @@ int main(int argc, char* argv[]) {
     }
     output << "---\n" << std::endl;
 
-    std::vector<Parser> code2 = parserfunc(code1);
+    std::map<int, std::vector<std::string>> code2 = parserfunc(code1);
 
     output << "PARSER: " << "\n\n";
-    for (const Parser& data : code2) {
-        output << "Expression Type: " << parsertypeto(data.what_is) << "\n";
-        for (size_t size = 0; size < data.args.size(); size++) {
-            output << "Argument[" << size+1 << "]: " << data.args[size] << "\n";
-        }
+    for (const auto& [line, data] : code2) {
+        output << "Line: " << line+1 << "\n";
+        for (size_t size = 0; size < data.size(); size++) output << data[size] << "\n";
         output << "\n";
     }
     output << "---";
