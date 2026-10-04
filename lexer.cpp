@@ -12,13 +12,14 @@ enum Mode {
 };
 
 static std::vector<char> sytnax_operator = {
-    '!',
+    ':',
     '+',
     '-',
     '*',
     '/',
     '=',
-    ':',
+    '(',
+    ')'
 };
 
 static bool isOperator(char& op) {
@@ -59,20 +60,29 @@ std::map<int, std::vector<Lexer::Out>> lexerfunc(std::stringstream& code) {
         }
 
         if (mode == Mode::comment1 || mode == Mode::comment2) {
-            if (i == '\n' && mode == Mode::comment1) mode = Mode::normal;
+            if (i == '\n' && mode == Mode::comment1) {
+                mode = Mode::normal;
+                continue;
+            }
             else if (i == '*' && mode == Mode::comment2) {
                 size++;
-                if (kod[size] == '/' && kod.size() > 1 + size) mode = Mode::normal;
+                if (kod[size] == '/' && kod.size() > 1 + size) {
+                    mode = Mode::normal;
+                    continue;
+                }
                 else size--;
             }
-            continue;
-        } else if (mode == Mode::string) {
+        }
+        
+        if (mode == Mode::string) {
             if (i == '\\' && kod.size() > 1 + size) {
                 size++;
                 token += i;
                 token += kod[size];
             } else token += i;
-        } else if (mode == Mode::normal) {
+        }
+        
+        if (mode == Mode::normal) {
             if (i == ';') {
                 if (!token.empty()) {
                     tokens.push_back(token);
@@ -85,10 +95,15 @@ std::map<int, std::vector<Lexer::Out>> lexerfunc(std::stringstream& code) {
                 if (mode != Mode::comment1 && mode != Mode::comment2) {
                     if (i == '/' && kod.size() > 1 + size) {
                         size++;
-                        if (kod[size] == '/') mode = Mode::comment1;
-                        else if (kod[size] == '*') mode = Mode::comment2;
-                        else size--;
-                        continue;
+                        if (kod[size] == '/') {
+                            mode = Mode::comment1;
+                            continue;
+                        } else if (kod[size] == '*') {
+                            mode = Mode::comment2;
+                            continue;
+                        } else {
+                            size--;
+                        }
                     }
                 } 
 
@@ -120,6 +135,7 @@ std::map<int, std::vector<Lexer::Out>> lexerfunc(std::stringstream& code) {
     for (size_t size = 0; size < lexerlayer1.size(); size++) {
         tokens = lexerlayer1[size];
         std::vector<Lexer::Out> tokensout;
+        Mode mode = Mode::normal;
 
         for (const std::string& i : tokens) {
             Lexer::Type type = Lexer::Type::noop;
@@ -132,12 +148,17 @@ std::map<int, std::vector<Lexer::Out>> lexerfunc(std::stringstream& code) {
                 if (isOperator(j)) newtype = Lexer::Type::yesop;
                 else newtype = Lexer::Type::noop;
 
-                if (type != newtype) {
+                if (mode == Mode::normal && type != newtype) {
                     if (!k.empty()) {
                         tokensout.push_back({.lexertype = type, .lexerdata = k});
                         k = "";
                     }
                     type = newtype;
+                }
+
+                if (j == '\"') {
+                    if (mode == Mode::normal) mode = Mode::string;
+                    else mode = Mode::normal;
                 }
 
                 k += j;
