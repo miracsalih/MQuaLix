@@ -16,33 +16,37 @@ struct Parserlayer1 {
 };
 
 struct Func {
-    static std::string set(std::vector<Parserlayer1> code) {
-        if (code.empty()) return "";
-
+    struct Out {
+        bool error;
         std::string out;
+    };
+
+    static Out set(std::vector<Parserlayer1> code) {
+        if (code.empty()) return {.error = true};
         bool right = false;
         bool name = false;
         std::string number1 = "0";
-        out = "new ";
+
+        std::string data[3] = {"", "", ""};
 
         for (size_t size = 0; size < code.size(); size++) {
-            if (!right) out += code[size].data;
-
-            if (code[size].data == "=" && (!right && name)) {
-                out += ";\ndata{;\n\tmov %0 ";
+            if (code[size].data == "=" && (!right)) {
                 if (size + 1 < code.size()) {
+                    data[2] = "\tmov %1 " + code[size+1].data + ";";
                     size++;
-                    out += code[size].data;
                 }
-                out += ";\n";
                 right = true;
                 continue;
             }
 
-            if (code[size].data != ":" && (!right && !name)) {
-                out += ";\nname ";
+            if (code[size].data == ":" && (!right && !name)) {
                 name = true;
                 continue;
+            }
+
+            if (!right) {
+                if (name) data[1] = code[size].data;
+                else data[0] = code[size].data;
             }
 
             if (right) {
@@ -52,16 +56,33 @@ struct Func {
                     op = code[size].data;
                     number2 = code[size+1].data;
 
-                    if (op == "+") out += "\tadd %" + number1 + " " + number2 + ";\n";
-                    else if (op == "-") out += "\tdec %" + number1 + " " + number2 + ";\n";
-                    else if (op == "*") out += "\tmul %" + number1 + " " + number2 + ";\n";
-                    else if (op == "/") out += "\tdiv %" + number1 + " " + number2 + ";\n";
+                    if (op == "+") data[2] += "\n\tadd %" + number1 + " " + number2 + ";";
+                    else if (op == "-") data[2] += "\n\tdec %" + number1 + " " + number2 + ";";
+                    else if (op == "*") data[2] += "\n\tmul %" + number1 + " " + number2 + ";";
+                    else if (op == "/") data[2] += "\n\tdiv %" + number1 + " " + number2 + ";";
                 }
             }
         }
+
+        std::string out = "";
+        if (name) {
+            if (data[0].empty() || data[1].empty()) return {.error = true};
+            out += "new(" + data[0] + ")" + data[1] + ";";
+        }
         
-        out += "};";
-        return out;
+        if (name && right) {
+            if (data[1].empty()) return {.error = true};
+            out += "\nset(" + data[1] + ")";
+            if (!data[2].empty()) out += "{\n" + data[2] + "\n};";
+            else out += "{};";
+        } else if (!name && right) {
+            if (data[0].empty()) return {.error = true};
+            out += "set(" + data[0] + ")";
+            if (!data[2].empty()) out += "{\n" + data[2] + "\n};";
+            else out += "{};";
+        } else return {.error = true};
+
+        return {.error = false, .out = out};
     }
 } static Func;
 
@@ -180,10 +201,18 @@ std::map<int, std::vector<std::string>> parserfunc(std::map<int, std::vector<Lex
 
     for (const auto& [line, parser] : parserlayer1) {        
         std::vector<std::string> tokens;
-        std::string token = "";
+        Func::Out token;
 
         token = Func::set(parser);
-        tokens.push_back(token);
+        if (!token.error) {
+            tokens.push_back(token.out);
+            out[line] = tokens;
+            continue;
+        }
+        // diğer fonksiyonlar...
+        if (token.error) {
+            tokens.push_back("error(line/expression: " + std::to_string(line+1) + ");");
+        }
 
         out[line] = tokens;
     }
