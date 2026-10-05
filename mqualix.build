@@ -1,3 +1,5 @@
+# Bunu çalıştırabilecek tek uygulama: https://github.com/miracsalih/JustBuild
+
 mode: normal
 workdir: MQuaLix
 arguments: ~/Masaüstü/Projeler/MQuaLix/test.micrap
