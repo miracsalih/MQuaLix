@@ -5,6 +5,9 @@ Line: 1
 Type: OPERATÖR DEĞİL
 Data: int
 
+Type: OPERATÖR
+Data: :
+
 Type: OPERATÖR DEĞİL
 Data: x
 
@@ -17,15 +20,44 @@ Data: 5
 Line: 2
 
 Type: OPERATÖR DEĞİL
-Data: int
+Data: x
+
+Type: OPERATÖR
+Data: =
 
 Type: OPERATÖR DEĞİL
-Data: x
+Data: 10
+
+Type: OPERATÖR
+Data: +
+
+Type: OPERATÖR DEĞİL
+Data: 6
 
 Line: 3
 
 Type: OPERATÖR DEĞİL
+Data: int
+
+Type: OPERATÖR
+Data: :
+
+Type: OPERATÖR DEĞİL
+Data: x
+
+Type: OPERATÖR
+Data: =
+
+Type: OPERATÖR DEĞİL
+Data: 5
+
+Line: 4
+
+Type: OPERATÖR DEĞİL
 Data: string
+
+Type: OPERATÖR
+Data: :
 
 Type: OPERATÖR DEĞİL
 Data: y
@@ -41,21 +73,27 @@ Data: "hello world!"
 PARSER: 
 
 Line: 1
-new int;
-name x=;
-data{;
-	mov %0 5;
+new(int)x;
+set(x){
+	mov %1 5;
 };
 
 Line: 2
-new int;
-name x};
+set(x){
+	mov %1 10;
+	add %0 6;
+};
 
 Line: 3
-new string;
-name y=;
-data{;
-	mov %0 "hello world!";
+new(int)x;
+set(x){
+	mov %1 5;
+};
+
+Line: 4
+new(string)y;
+set(y){
+	mov %1 "hello world!";
 };
 
 ---
