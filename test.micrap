@@ -1,4 +1,5 @@
+x~;
 int: x = 5;
-x = 10+6;
+x = 10+;
 int: x = 5;
-string: y = "hello world!
+string: y = "hello world!"";
