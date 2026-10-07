@@ -18,6 +18,7 @@ static std::vector<char> sytnax_operator = {
     '*',
     '/',
     '=',
+    ',',
     '(',
     ')'
 };
@@ -28,7 +29,7 @@ static bool isOperator(char& op) {
     return equal;
 }
 
-std::map<int, std::vector<Lexer::Out>> lexerfunc(std::stringstream& code) {
+std::map<int, std::vector<Lexer>> lexerfunc(std::stringstream& code) {
     std::map<int, std::vector<std::string>> lexerlayer1;
     std::vector<std::string> tokens;
     std::string token;
@@ -129,31 +130,30 @@ std::map<int, std::vector<Lexer::Out>> lexerfunc(std::stringstream& code) {
 
 
     tokens.clear();
-    std::map<int, std::vector<Lexer::Out>> lexerlayer2;
+    std::map<int, std::vector<Lexer>> lexerlayer2;
     line = 0;
 
-    for (size_t size = 0; size < lexerlayer1.size(); size++) {
-        tokens = lexerlayer1[size];
-        std::vector<Lexer::Out> tokensout;
+    for (const auto& [line, kod] : lexerlayer1) {
+        std::vector<Lexer> tokensout;
         Mode mode = Mode::normal;
 
-        for (const std::string& i : tokens) {
-            Lexer::Type type = Lexer::Type::noop;
+        for (const std::string& i : kod) {
+            Lexer::Op op = Lexer::Op::noop;
             std::string k;
 
             for (size_t idx = 0; idx < i.size(); idx++) {
-                Lexer::Type newtype;
+                Lexer::Op newtype;
                 char j = i[idx];
 
-                if (isOperator(j)) newtype = Lexer::Type::yesop;
-                else newtype = Lexer::Type::noop;
+                if (isOperator(j)) newtype = Lexer::Op::yesop;
+                else newtype = Lexer::Op::noop;
 
-                if (mode == Mode::normal && type != newtype) {
+                if (mode == Mode::normal && op != newtype) {
                     if (!k.empty()) {
-                        tokensout.push_back({.lexertype = type, .lexerdata = k});
+                        tokensout.push_back({.lexerop = op, .lexerdata = k});
                         k = "";
                     }
-                    type = newtype;
+                    op = newtype;
                 }
 
                 if (j == '\"') {
@@ -164,12 +164,101 @@ std::map<int, std::vector<Lexer::Out>> lexerfunc(std::stringstream& code) {
                 k += j;
             }
 
-            if (!k.empty()) tokensout.push_back({.lexertype = type, .lexerdata = k});
+            if (!k.empty()) tokensout.push_back({.lexerop = op, .lexerdata = k});
         }
 
         lexerlayer2[line] = tokensout;
-        line++;
     }
 
-    return lexerlayer2;
+
+
+    std::map<int, std::vector<Lexer>> lexerlayer3;
+
+    for (const auto& [line, kod] : lexerlayer2) {
+        std::vector<Lexer> tokens;
+
+        for (size_t size = 0; size < kod.size(); size++) {
+            Lexer token = kod[size];
+
+            if (token.lexerop == Lexer::Op::noop) {
+                if (token.lexerdata.size() > 2 && token.lexerdata.substr(0, 2) == "0x") {
+                    token.lexerdata.erase(0, 2);
+
+                    bool error = false;
+                    for (const char& i : token.lexerdata) if (!((i >= 'a' && i <= 'z') || (i >= 'A' && i <= 'Z') || (i >= '0' && i <= '9'))) error = true;
+
+                    if (error) continue;
+
+                    tokens.push_back({
+                        .lexertype = Lexer::Type::Number,
+                        .lexerop = Lexer::Op::noop,
+                        .lexerdata = std::to_string(std::stoi(token.lexerdata, 0, 16))
+                    });
+                    continue;
+                }
+
+                else if (token.lexerdata.size() > 2 && token.lexerdata.substr(0, 2) == "0b") {
+                    token.lexerdata.erase(0, 2);
+
+                    bool error = false;
+                    for (const char& i : token.lexerdata) if (i != '0' && i != '1') error = true;
+
+                    if (error) continue;
+
+                    tokens.push_back({
+                        .lexertype = Lexer::Type::Number,
+                        .lexerop = Lexer::Op::noop,
+                        .lexerdata = std::to_string(std::stoi(token.lexerdata, 0, 2))
+                    });
+                    continue;
+                }
+
+                else if (token.lexerdata.size() > 1 && token.lexerdata.substr(0, 2).front() == '0') {
+                    token.lexerdata.erase(token.lexerdata.begin());
+
+                    bool error = false;
+                    for (const char& i : token.lexerdata) if (!(i >= '0' && i <= '7')) error = true;
+
+                    if (error) continue;
+
+                    tokens.push_back({
+                        .lexertype = Lexer::Type::Number,
+                        .lexerop = Lexer::Op::noop,
+                        .lexerdata = std::to_string(std::stoi(token.lexerdata, 0, 8))});
+                    continue;
+                }
+
+                else {
+                    bool error = false;
+                    for (const char& i : token.lexerdata) if (!(i >= '0' && i <= '9')) error = true;
+
+                    if (error) {
+                        tokens.push_back({
+                            .lexertype = Lexer::Type::Keyword,
+                            .lexerop = Lexer::Op::noop,
+                            .lexerdata = token.lexerdata});
+                        continue;
+                    }
+
+                    tokens.push_back({
+                        .lexertype = Lexer::Type::Number,
+                        .lexerop = Lexer::Op::noop,
+                        .lexerdata = std::to_string(std::stoi(token.lexerdata, 0, 10))});
+                    continue;
+                }
+            }
+
+            else {
+                tokens.push_back({
+                    .lexertype = Lexer::Type::Operator,
+                    .lexerop = Lexer::Op::yesop,
+                    .lexerdata = token.lexerdata
+                });
+            }
+        }
+
+        lexerlayer3[line] = tokens;
+    }
+
+    return lexerlayer3;
 }
