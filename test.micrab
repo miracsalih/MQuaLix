@@ -2,98 +2,126 @@ LEXER:
 
 Line: 1
 
-Type: OPERATÖR DEĞİL
-Data: int
-
-Type: OPERATÖR
-Data: :
-
-Type: OPERATÖR DEĞİL
-Data: x
-
-Type: OPERATÖR
-Data: =
-
-Type: OPERATÖR DEĞİL
-Data: 5
+Type: Keyword
+Op  : OPERATÖR DEĞİL
+Data: x~
 
 Line: 2
 
-Type: OPERATÖR DEĞİL
+Type: Keyword
+Op  : OPERATÖR DEĞİL
+Data: int
+
+Type: Operator
+Op  : OPERATÖR
+Data: :
+
+Type: Keyword
+Op  : OPERATÖR DEĞİL
 Data: x
 
-Type: OPERATÖR
+Type: Operator
+Op  : OPERATÖR
 Data: =
 
-Type: OPERATÖR DEĞİL
-Data: 10
-
-Type: OPERATÖR
-Data: +
-
-Type: OPERATÖR DEĞİL
-Data: 6
+Type: Number
+Op  : OPERATÖR DEĞİL
+Data: 5
 
 Line: 3
 
-Type: OPERATÖR DEĞİL
-Data: int
-
-Type: OPERATÖR
-Data: :
-
-Type: OPERATÖR DEĞİL
+Type: Keyword
+Op  : OPERATÖR DEĞİL
 Data: x
 
-Type: OPERATÖR
+Type: Operator
+Op  : OPERATÖR
 Data: =
 
-Type: OPERATÖR DEĞİL
-Data: 5
+Type: Number
+Op  : OPERATÖR DEĞİL
+Data: 10
+
+Type: Operator
+Op  : OPERATÖR
+Data: +
 
 Line: 4
 
-Type: OPERATÖR DEĞİL
-Data: string
+Type: Keyword
+Op  : OPERATÖR DEĞİL
+Data: int
 
-Type: OPERATÖR
+Type: Operator
+Op  : OPERATÖR
 Data: :
 
-Type: OPERATÖR DEĞİL
-Data: y
+Type: Keyword
+Op  : OPERATÖR DEĞİL
+Data: x
 
-Type: OPERATÖR
+Type: Operator
+Op  : OPERATÖR
 Data: =
 
-Type: OPERATÖR DEĞİL
+Type: Number
+Op  : OPERATÖR DEĞİL
+Data: 5
+
+Line: 5
+
+Type: Keyword
+Op  : OPERATÖR DEĞİL
+Data: string
+
+Type: Operator
+Op  : OPERATÖR
+Data: :
+
+Type: Keyword
+Op  : OPERATÖR DEĞİL
+Data: y
+
+Type: Operator
+Op  : OPERATÖR
+Data: =
+
+Type: Keyword
+Op  : OPERATÖR DEĞİL
 Data: "hello world!"
+
+Type: Keyword
+Op  : OPERATÖR DEĞİL
+Data: ";"
 
 ---
 
 PARSER: 
 
 Line: 1
-new(int)x;
-set(x){
-	mov %1 5;
-};
+del x;
 
 Line: 2
-set(x){
-	mov %1 10;
-	add %0 6;
+new int x;
+set x {
+	mov %0 5;
 };
 
 Line: 3
-new(int)x;
-set(x){
-	mov %1 5;
+set x {
+	mov %0 10;
 };
 
 Line: 4
-new(string)y;
-set(y){
-	mov %1 "hello world!";
+new int x;
+set x {
+	mov %0 5;
+};
+
+Line: 5
+new string y;
+set y {
+	mov %0 "hello world!";
 };
 
 ---
