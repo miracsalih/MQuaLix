@@ -21,7 +21,13 @@ static void return_error(const std::string& error_information, const int returns
 }
 
 static std::string lexertypeto(Lexer::Type lexertype) {
-    if (lexertype == Lexer::Type::noop) return "OPERATÖR DEĞİL";
+    if (lexertype == Lexer::Type::Keyword) return "Keyword";
+    else if (lexertype == Lexer::Type::Number) return "Number";
+    else return "Operator";
+}
+
+static std::string lexeroperto(Lexer::Op lexerop) {
+    if (lexerop == Lexer::Op::noop) return "OPERATÖR DEĞİL";
     else return "OPERATÖR";
 }
 
@@ -46,13 +52,14 @@ int main(int argc, char* argv[]) {
     std::stringstream ss;
     ss << input.rdbuf();
 
-    std::map<int, std::vector<Lexer::Out>> code1 = lexerfunc(ss);
+    std::map<int, std::vector<Lexer>> code1 = lexerfunc(ss);
 
     output << "LEXER: " << "\n\n";
-    for (const auto& [line, out] : code1) {
+    for (const auto& [line, lexer] : code1) {
         output << "Line: " << line+1 << "\n\n";
-        for (const auto& [type, data] : out) {
+        for (const auto& [type, op, data] : lexer) {
             output << "Type: " << lexertypeto(type) << "\n"
+                   << "Op  : " << lexeroperto(op) << "\n"
                    << "Data: " << data << "\n\n";
         }
     }
