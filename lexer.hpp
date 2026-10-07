@@ -5,14 +5,19 @@
 
 struct Lexer {
     enum Type {
+        Number,
+        Keyword,
+        Operator
+    };
+
+    enum Op {
         yesop,
         noop
     };
 
-    struct Out {
-        Lexer::Type lexertype;      // TYPE
-        std::string lexerdata;      // DATA
-    };
+    Lexer::Type lexertype;        // TYPE
+    Lexer::Op lexerop;            // OPER
+    std::string lexerdata;        // DATA
 };
 
-std::map<int, std::vector<Lexer::Out>> lexerfunc(std::stringstream& code);
+std::map<int, std::vector<Lexer>> lexerfunc(std::stringstream& code);
