@@ -18,6 +18,7 @@ static std::vector<char> sytnax_operator = {
     '*',
     '/',
     '=',
+    '!',
     ',',
     '(',
     ')'
