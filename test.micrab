@@ -4,124 +4,104 @@ Line: 1
 
 Type: Keyword
 Op  : OPERATÖR DEĞİL
-Data: x~
+Data: if
+
+Type: Number
+Op  : OPERATÖR DEĞİL
+Data: 12
+
+Type: Operator
+Op  : OPERATÖR
+Data: ==
+
+Type: Number
+Op  : OPERATÖR DEĞİL
+Data: 12
 
 Line: 2
 
 Type: Keyword
 Op  : OPERATÖR DEĞİL
-Data: int
-
-Type: Operator
-Op  : OPERATÖR
-Data: :
-
-Type: Keyword
-Op  : OPERATÖR DEĞİL
-Data: x
-
-Type: Operator
-Op  : OPERATÖR
-Data: =
+Data: if
 
 Type: Number
 Op  : OPERATÖR DEĞİL
-Data: 5
+Data: 12
+
+Type: Operator
+Op  : OPERATÖR
+Data: !=
+
+Type: Number
+Op  : OPERATÖR DEĞİL
+Data: 11
 
 Line: 3
 
 Type: Keyword
 Op  : OPERATÖR DEĞİL
-Data: x
-
-Type: Operator
-Op  : OPERATÖR
-Data: =
+Data: if
 
 Type: Number
 Op  : OPERATÖR DEĞİL
-Data: 10
+Data: 12
 
 Type: Operator
 Op  : OPERATÖR
-Data: +
+Data: ==
+
+Type: Number
+Op  : OPERATÖR DEĞİL
+Data: 12
+
+Type: Keyword
+Op  : OPERATÖR DEĞİL
+Data: &&
+
+Type: Number
+Op  : OPERATÖR DEĞİL
+Data: 12
+
+Type: Operator
+Op  : OPERATÖR
+Data: !=
+
+Type: Number
+Op  : OPERATÖR DEĞİL
+Data: 11
 
 Line: 4
 
 Type: Keyword
 Op  : OPERATÖR DEĞİL
-Data: int
-
-Type: Operator
-Op  : OPERATÖR
-Data: :
+Data: if
 
 Type: Keyword
 Op  : OPERATÖR DEĞİL
-Data: x
+Data: a
 
 Type: Operator
 Op  : OPERATÖR
-Data: =
+Data: ==
 
 Type: Number
 Op  : OPERATÖR DEĞİL
-Data: 5
-
-Line: 5
-
-Type: Keyword
-Op  : OPERATÖR DEĞİL
-Data: string
-
-Type: Operator
-Op  : OPERATÖR
-Data: :
-
-Type: Keyword
-Op  : OPERATÖR DEĞİL
-Data: y
-
-Type: Operator
-Op  : OPERATÖR
-Data: =
-
-Type: Keyword
-Op  : OPERATÖR DEĞİL
-Data: "hello world!"
-
-Type: Keyword
-Op  : OPERATÖR DEĞİL
-Data: ";"
+Data: 54
 
 ---
 
 PARSER: 
 
 Line: 1
-del x;
+if (12==12)
 
 Line: 2
-new int x;
-set x {
-	mov %0 5;
-};
+if (12!=11)
 
 Line: 3
-set x {
-	mov %0 10;
-};
+if (12==12)&&(12!=11)
 
 Line: 4
-new int x;
-set x {
-	mov %0 5;
-};
-
-Line: 5
-new string y;
-set y {
-	mov %0 "hello world!";
-};
+if (a==54)
 
 ---
