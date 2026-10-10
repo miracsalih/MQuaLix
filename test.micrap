@@ -1,5 +1,4 @@
-x~;
-int: x = 5;
-x = 10+;
-int: x = 5;
-string: y = "hello world!"";
+if 12 == 12;
+if 12 != 11;
+if 12 == 12 && 12 != 11;
+if a==54;
