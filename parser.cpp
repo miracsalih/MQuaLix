@@ -75,16 +75,69 @@ struct Func {
         return {.error = false, .out = out};
     }
 
+    struct If {
+        enum Operator {
+            iseq,   // ==
+            noteq,  // !=
+            unk     // ?
+        };
+
+        If::Operator ifoperator;
+        std::string left, right;
+    };
+
     static Out equal(std::vector<Lexer> code) {
         if (code.empty()) return {.error = true};
-        std::string data[2] = {"", ""};
 
         if (code[0].lexerdata != "if") return {.error = true};
+        
+        code.erase(code.begin());
+        std::vector<Func::If> datas;
+        Func::If data;
+        bool right = false;
 
         for (size_t size = 0; size < code.size(); size++) {
+            if (code[size].lexerdata == "&&" && right) {
+                datas.push_back(data);
+                data.ifoperator = If::Operator::unk;
+                data.left = "";
+                data.right = "";
+                right = false;
+                continue;
+            }
+
+            else if (code[size].lexertype == Lexer::Type::Operator && !right) {
+                if (code[size].lexerdata == "==") data.ifoperator = If::Operator::iseq;
+                else if (code[size].lexerdata == "!=") data.ifoperator = If::Operator::noteq;
+                else continue;
+                right = true;
+                continue;
+            }
+
+            if (!right) data.left += code[size].lexerdata;
+            else data.right += code[size].lexerdata;
         }
 
-        std::string out = "";
+        if (!data.right.empty()) {
+            datas.push_back(data);
+            data.right = "";
+        }
+
+        std::string out = "if (";
+        for (size_t size = 0; size < datas.size(); size++) {
+            data = datas[size];
+
+            std::string op;
+            if (data.ifoperator == If::Operator::iseq) op = "==";
+            else if (data.ifoperator == If::Operator::noteq) op = "!=";
+            else return {.error = true};
+
+            if (size > 0) {
+                out += "&&(";
+            }
+
+            out += data.left + op + data.right + ")";
+        }
 
         return {.error = false, .out = out};
     }
